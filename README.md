@@ -42,7 +42,7 @@ La aplicación levanta un servidor Express en el puerto definido en `.env` y, al
 - `.env`: variables de entorno del proyecto, como el puerto del servidor.
 - `.git/`: historial y metadatos internos de Git.
 - `.gitignore`: archivos y carpetas que Git no debe versionar.
-- `.sequelizerc`: configuración de rutas para Sequelize CLI.
+- `.sequelizerc`: configuración de rutas para Sequelize CLI, incluyendo el archivo de configuración principal.
 - `package.json`: definición del proyecto, dependencias y scripts.
 - `package-lock.json`: bloquea versiones exactas de las dependencias instaladas.
 - `node_modules/`: dependencias instaladas por npm. No se edita manualmente.
@@ -62,6 +62,7 @@ Contiene el código principal de la aplicación.
 ### Carpeta `src/config/`
 
 - `src/config/database.js`: configura Sequelize con SQLite y valida la conexión al iniciar la aplicación.
+- `src/config/config.cjs`: configuración para Sequelize CLI (entorno `development`) y ruta de la base de datos.
 
 ### Carpeta `src/database/`
 
@@ -84,3 +85,4 @@ Todavía no hay rutas, modelos, controladores ni migraciones implementadas. La r
 - El servidor usa `process.env.PORT`, por lo que el archivo `.env` debe incluir ese valor.
 - La base de datos está configurada con SQLite y apunta al archivo `src/database/database.sqlite`.
 - La configuración de Sequelize CLI en `.sequelizerc` espera la estructura actual dentro de `src/`.
+- Sequelize CLI usa `src/config/config.cjs` como archivo de configuración principal.
