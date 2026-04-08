@@ -69,16 +69,68 @@ Contiene el código principal de la aplicación.
 - `src/database/database.sqlite`: archivo físico de la base de datos SQLite.
 - `src/database/migrations/`: carpeta reservada para migraciones de la base de datos.
 
-## Estado actual del proyecto
+## Registro de ayudantías
 
-Hasta este momento el proyecto tiene lo siguiente listo:
+### Ayudantía 1 - Inicialización del proyecto
 
-- servidor Express inicializado
-- conexión a SQLite configurada
-- estructura base para rutas, controladores y modelos
-- carpeta para migraciones preparada
+- Servidor Express inicializado con clase `Server` en `src/server.js`
+- Conexión a SQLite configurada en `src/config/database.js`
+- Estructura base de carpetas: `controllers/`, `models/`, `routes/`, `database/`
+- Configuración de Sequelize CLI con `config.cjs` y `.sequelizerc`
+- Carpeta para migraciones preparada
 
-Todavía no hay rutas, modelos, controladores ni migraciones implementadas. La respuesta actual del servidor está definida de forma temporal en `src/server.js`.
+### Ayudantía 2 - Modelos, Migraciones y Controladores
+
+**Branch:** `Ayudantia2-Modelos-Migraciones-Controllador`
+
+#### Modelos creados
+
+- **Role** (`src/models/role.js`): campos `id`, `name`, `description`
+- **User** (`src/models/user.js`): campos `id`, `email`, `password`, `name`, `username`, `phone`, `profile_picture`, `language`, `theme` (ENUM: light/dark/automatic), `roleId` (FK a Roles), `status` (ENUM: active/suspend/unconfirmed)
+
+#### Asociaciones (`src/models/associations.js`)
+
+- `Role.hasMany(User)` — un rol tiene muchos usuarios
+- `User.belongsTo(Role)` — un usuario pertenece a un rol
+
+#### Migraciones creadas (`src/database/migrations/`)
+
+- `20260408160008-create-roles.cjs` — crea tabla `Roles`
+- `20260408202538-create-user.cjs` — crea tabla `Users` con FK a `Roles`
+
+#### Rutas
+
+- Router principal en `src/routes/api.js` bajo el prefijo `/api`
+- **Roles** (`src/routes/api/role.js`):
+  - `GET /api/role/` — obtener todos los roles
+  - `POST /api/role/` — crear un rol
+- **Users** (`src/routes/api/user.js`):
+  - `GET /api/user/` — obtener todos los usuarios
+  - `POST /api/user/` — crear un usuario
+
+#### Controladores
+
+- **Role** (`src/controllers/role.js`):
+  - `getRoles` — retorna todos los roles
+  - `createRole` — crea un rol (requiere `name`)
+- **User** (`src/controllers/user.js`):
+  - `getUsers` — retorna todos los usuarios
+  - `createUser` — crea un usuario validando campos requeridos (`email`, `password`, `name`, `username`, `phone`) y verificando duplicados de `email`, `username` y `phone` con una sola query usando `Op.or`
+
+#### Cambios en `src/server.js`
+
+- Se agregaron middlewares: `express.json()` y `cors()`
+- Se reemplazó la ruta temporal por el router principal (`/api`)
+- Se inicializan las asociaciones de modelos al arrancar
+
+#### Pruebas HTTP (`Pruebas http/`)
+
+- `role.http` — pruebas para GET y POST de roles
+- `user.http` — pruebas para GET y POST de usuarios
+
+#### Diagrama
+
+- `Modelo ER.png` — diagrama entidad-relación del proyecto
 
 ## Notas importantes
 
