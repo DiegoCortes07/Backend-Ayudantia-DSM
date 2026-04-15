@@ -9,6 +9,7 @@ export async function getUsers(req, res) {
     if (users.length === 0) {
       return res.status(400).json({ message: "No se encontraron usuarios" });
     }
+    return res.status(200).json(users);
   } catch (error) {
     console.error("Error al obtener los usuarios", error);
     return res.status(500).json({ message: "Error al obtener los usuarios" });

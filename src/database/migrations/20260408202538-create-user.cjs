@@ -38,10 +38,12 @@ module.exports = {
       },
       language: {
         type: Sequelize.STRING,
+        defaultValue: "es",
         allowNull: true,
       },
       theme: {
         type: Sequelize.ENUM("light", "dark", "automatic"),
+        defaultValue: "light",
         allowNull: true,
       },
       roleId: {

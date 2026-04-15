@@ -39,11 +39,11 @@ User.init(
     },
     language: {
       type: DataTypes.STRING,
-      allowNull: true,
+      defaultValue: "es",
     },
     theme: {
       type: DataTypes.ENUM("light", "dark", "automatic"),
-      allowNull: true,
+      defaultValue: "light",
     },
     roleId: {
       type: DataTypes.INTEGER,
