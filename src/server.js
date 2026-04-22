@@ -2,13 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import http from "http";
-import "./config/database.js";
 import RouterApp from "./routes/api.js";
 import cors from "cors";
-
-import { initializeAssociations } from "./models/associations.js";
-
-initializeAssociations();
 
 export default class Server {
   constructor() {

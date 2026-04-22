@@ -1,5 +1,7 @@
 import User from "../models/user.js";
 import { Op } from "sequelize";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Funciones para el modelo USER
 
@@ -34,19 +36,64 @@ export async function createUser(req, res) {
       return res.status(400).json({ message: "El usuario ya está registrado" });
     }
 
+    // hashear y agregar salt a la contraseña
+    const passwordHash = await bcrypt.hash(password, 10);
+
     const newUser = await User.create({
       email,
-      password,
+      password: passwordHash,
       name,
       username,
       phone,
       roleId: 1, // Asignar el rol de "Usuario" por defecto
     });
+
+    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    const { password: _pw, ...safeUser } = newUser.toJSON();
+
     return res
       .status(201)
-      .json({ message: "Usuario creado exitosamente", user: newUser });
+      .json({ message: "Usuario creado exitosamente", user: safeUser, token });
   } catch (error) {
     console.log(`Error en el servidor al crear un usuario, error: ${error}`);
     return res.status(500).json({ message: "Error en el servidor.. ", error });
+  }
+}
+
+export async function loginUser(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Campos insuficientes.." });
+    }
+
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(400).json({ message: "Usuario no encontrado" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Contraseña incorrecta" });
+    }
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    const { password: _pw, ...safeUser } = user.toJSON();
+
+    return res
+      .status(200)
+      .json({ message: "Login exitoso", token, user: safeUser });
+  } catch (error) {
+    console.error("Error al iniciar sesión", error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 }
