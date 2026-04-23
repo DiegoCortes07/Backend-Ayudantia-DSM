@@ -1,24 +1,31 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import http from "http";
 import RouterApp from "./routes/api.js";
 import cors from "cors";
+import { initializeAssociations } from "./models/associations.js";
 
 export default class Server {
   constructor() {
     this.app = express();
-    this.server = http.createServer(this.app);
     this.middlewares();
     this.routes();
   }
+
   listen() {
-    this.app.listen(process.env.PORT, () => {
-      console.log("Hola!!");
-      console.log(
-        `Servidor corriendo en el puerto http://localhost:${process.env.PORT}`,
-      );
-    });
+    try {
+      initializeAssociations();
+
+      this.app.listen(process.env.PORT, () => {
+        console.log("Hola!!");
+        console.log(
+          `Servidor corriendo en el puerto http://localhost:${process.env.PORT}`,
+        );
+      });
+    } catch (error) {
+      console.error("Error al iniciar el servidor", error);
+      process.exit(1);
+    }
   }
 
   routes() {

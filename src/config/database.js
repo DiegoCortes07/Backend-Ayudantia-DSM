@@ -1,14 +1,8 @@
 import { Sequelize } from "sequelize";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const storagePath = path.resolve(__dirname, "../database/database.sqlite");
 
 const database = new Sequelize({
   dialect: "sqlite",
-  storage: storagePath,
+  storage: "./src/database/database.sqlite",
 });
 
 const auth = async () => {
