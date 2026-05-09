@@ -3,7 +3,9 @@ dotenv.config();
 import express from "express";
 import RouterApp from "./routes/api.js";
 import cors from "cors";
+import morgan from "morgan";
 import { initializeAssociations } from "./models/associations.js";
+import { seedDatabase } from "./database/seedDatabase.js";
 
 export default class Server {
   constructor() {
@@ -12,9 +14,10 @@ export default class Server {
     this.routes();
   }
 
-  listen() {
+  async listen() {
     try {
       initializeAssociations();
+      await seedDatabase();
 
       this.app.listen(process.env.PORT, () => {
         console.log("Hola!!");
@@ -33,6 +36,7 @@ export default class Server {
   }
 
   middlewares() {
+    this.app.use(morgan("dev"));
     this.app.use(express.json());
     this.app.use(cors());
   }

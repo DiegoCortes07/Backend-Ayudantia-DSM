@@ -1,0 +1,25 @@
+get http://localhost:8000/api/products/
+
+###
+
+post http://localhost:8000/api/products/
+Content-Type: application/json
+
+{
+     "name" : "Producto de prueba",
+     "description" : "Descripcion del producto de prueba",
+     "price" : 9990,
+     "stock" : 25,
+     "is_active" : true
+}
+
+###
+
+post http://localhost:8000/api/products/
+Content-Type: application/json
+
+{
+     "name" : "Producto sin descripcion",
+     "price" : 4990,
+     "stock" : 10
+}

@@ -68,6 +68,8 @@ Contiene el código principal de la aplicación.
 
 - `src/database/database.sqlite`: archivo físico de la base de datos SQLite.
 - `src/database/migrations/`: carpeta reservada para migraciones de la base de datos.
+- `src/database/seedDatabase.js`: ejecuta la carga inicial de datos usando una transacción.
+- `src/database/seeders/`: contiene los seeders iniciales para roles, usuarios y productos.
 
 ## Registro de ayudantías
 
@@ -132,9 +134,86 @@ Contiene el código principal de la aplicación.
 
 - `Modelo ER.png` — diagrama entidad-relación del proyecto
 
+### Ayudantía 4 - Productos y datos iniciales
+
+En esta ayudantía se agregó el módulo de productos y se incorporó una carga inicial de datos para levantar la aplicación con información base.
+
+#### Modelo Product
+
+- **Product** (`src/models/product.js`): representa la tabla `Products`.
+- Campos definidos:
+  - `id`: entero, autoincremental, clave primaria.
+  - `name`: texto obligatorio.
+  - `description`: texto opcional.
+  - `price`: decimal obligatorio con formato `DECIMAL(10, 2)`.
+  - `stock`: entero obligatorio, con valor por defecto `0`.
+  - `is_active`: booleano obligatorio, con valor por defecto `true`.
+- El modelo usa `timestamps: false`, igual que los modelos trabajados previamente.
+
+#### Migración de productos
+
+- `src/database/migrations/20260506110000-create-products.cjs` crea la tabla `Products`.
+- La migración define los mismos campos del modelo `Product`.
+- El método `down` elimina la tabla `Products` con `dropTable`.
+
+#### Controlador de productos
+
+- **Product** (`src/controllers/product.js`):
+  - `getProducts`: obtiene todos los productos con `Product.findAll()`.
+  - Si no existen productos, responde con estado `400` y el mensaje `No se encontraron productos`.
+  - Si existen productos, responde con estado `200` y el listado.
+  - `createProduct`: crea un producto nuevo desde el body de la request.
+  - Valida que existan los campos obligatorios `name`, `price` y `stock`.
+  - Valida que `price` y `stock` no sean negativos.
+  - Si `description` no viene en el body, se guarda como `null`.
+  - Si `is_active` no viene en el body, se guarda como `true`.
+
+#### Rutas de productos
+
+- **Products** (`src/routes/api/product.js`):
+  - `GET /api/products/` — obtener todos los productos.
+  - `POST /api/products/` — crear un producto.
+- El router principal (`src/routes/api.js`) importa `RouterProduct` y lo monta bajo el prefijo `/products`.
+
+#### Seeds iniciales
+
+- Se agregó `src/database/seedDatabase.js` para centralizar la ejecución de seeds.
+- `seedDatabase` ejecuta `sequelize.sync()` y luego corre los seeds dentro de una transacción.
+- Si ocurre un error durante la carga inicial, se hace `rollback` y se detiene el inicio del servidor.
+- Seeds creados:
+  - `src/database/seeders/roles.js`: crea los roles `Usuario` y `Admin` si la tabla `Roles` está vacía.
+  - `src/database/seeders/users.js`: crea usuarios iniciales si la tabla `Users` está vacía.
+  - `src/database/seeders/products.js`: crea productos iniciales si la tabla `Products` está vacía.
+- Los usuarios iniciales usan `bcrypt` para guardar la contraseña hasheada.
+- La contraseña base usada por el seeder de usuarios es `password123`.
+
+#### Cambios en User
+
+- En `src/models/user.js` se corrigió la ubicación del campo `status`.
+- `status` queda definido como un atributo propio del modelo `User`, no dentro de la configuración de `roleId`.
+- Valores permitidos para `status`: `active`, `suspend`, `unconfirmed`.
+- Valor por defecto: `active`.
+
+#### Cambios en Server
+
+- En `src/server.js` el método `listen` ahora es `async`.
+- Al iniciar el servidor se ejecutan:
+  - `initializeAssociations()`
+  - `seedDatabase()`
+- Se agregó el middleware `morgan("dev")` para registrar las requests en consola durante el desarrollo.
+- Si falla la inicialización, el servidor muestra el error y termina el proceso con `process.exit(1)`.
+
+#### Pruebas HTTP
+
+- `Pruebas http/product.http` incluye pruebas manuales para:
+  - `GET http://localhost:8000/api/products/`
+  - `POST http://localhost:8000/api/products/` creando un producto completo.
+  - `POST http://localhost:8000/api/products/` creando un producto sin descripción.
+
 ## Notas importantes
 
 - El servidor usa `process.env.PORT`, por lo que el archivo `.env` debe incluir ese valor.
 - La base de datos está configurada con SQLite y apunta al archivo `src/database/database.sqlite`.
 - La configuración de Sequelize CLI en `.sequelizerc` espera la estructura actual dentro de `src/`.
 - Sequelize CLI usa `src/config/config.cjs` como archivo de configuración principal.
+- Al iniciar el servidor, `seedDatabase()` sincroniza los modelos y carga datos iniciales solo cuando las tablas están vacías.

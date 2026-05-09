@@ -45,17 +45,17 @@ User.init(
       type: DataTypes.ENUM("light", "dark", "automatic"),
       defaultValue: "light",
     },
+    status: {
+      type: DataTypes.ENUM("active", "suspend", "unconfirmed"),
+      allowNull: false,
+      defaultValue: "active",
+    },
     roleId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: "Roles",
         key: "id",
-      },
-      status: {
-        type: DataTypes.ENUM("active", "suspend", "unconfirmed"),
-        allowNull: false,
-        defaultValue: "active",
       },
     },
   },
