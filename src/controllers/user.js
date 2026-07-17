@@ -5,6 +5,18 @@ import jwt from "jsonwebtoken";
 
 // Funciones para el modelo USER
 
+function getSafeUser(user) {
+  const { password: _pw, ...safeUser } = user.toJSON();
+  return safeUser;
+}
+
+function getUserPreferences(user) {
+  return {
+    language: user.language || "es",
+    theme: user.theme || "light",
+  };
+}
+
 export async function getUsers(req, res) {
   try {
     const users = await User.findAll();
@@ -52,7 +64,7 @@ export async function createUser(req, res) {
       expiresIn: "1h",
     });
 
-    const { password: _pw, ...safeUser } = newUser.toJSON();
+    const safeUser = getSafeUser(newUser);
 
     return res
       .status(201)
@@ -87,7 +99,7 @@ export async function loginUser(req, res) {
       expiresIn: "1h",
     });
 
-    const { password: _pw, ...safeUser } = user.toJSON();
+    const safeUser = getSafeUser(user);
 
     return res
       .status(200)
@@ -95,5 +107,50 @@ export async function loginUser(req, res) {
   } catch (error) {
     console.error("Error al iniciar sesión", error);
     return res.status(500).json({ message: "Error en el servidor" });
+  }
+}
+
+export async function getMyPreferences(req, res) {
+  try {
+    return res.status(200).json({
+      user: getSafeUser(req.user),
+      preferences: getUserPreferences(req.user),
+    });
+  } catch (error) {
+    console.error("Error al obtener preferencias", error);
+    return res.status(500).json({ message: "Error al obtener preferencias" });
+  }
+}
+
+export async function updateMyPreferences(req, res) {
+  try {
+    const { language, theme } = req.body;
+    const nextPreferences = {};
+
+    if (language !== undefined) {
+      nextPreferences.language = String(language).trim() || "es";
+    }
+
+    if (theme !== undefined) {
+      const validThemes = ["light", "dark", "automatic"];
+
+      if (!validThemes.includes(theme)) {
+        return res.status(400).json({ message: "Tema invalido" });
+      }
+
+      nextPreferences.theme = theme;
+    }
+
+    await req.user.update(nextPreferences);
+
+    return res.status(200).json({
+      user: getSafeUser(req.user),
+      preferences: getUserPreferences(req.user),
+    });
+  } catch (error) {
+    console.error("Error al actualizar preferencias", error);
+    return res
+      .status(500)
+      .json({ message: "Error al actualizar preferencias" });
   }
 }
