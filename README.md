@@ -1,4 +1,4 @@
-# Backend Ayudantía DSM
+  # Backend Ayudantía DSM
 
 Proyecto backend hecho con Node.js, Express, Sequelize y SQLite. La aplicación arranca desde `src/app.js`, crea un servidor HTTP en `src/server.js` y valida la conexión a la base de datos al cargar `src/config/database.js`.
 
@@ -209,6 +209,19 @@ En esta ayudantía se agregó el módulo de productos y se incorporó una carga 
   - `GET http://localhost:8000/api/products/`
   - `POST http://localhost:8000/api/products/` creando un producto completo.
   - `POST http://localhost:8000/api/products/` creando un producto sin descripción.
+
+## Simulacion delivery con Socket.IO
+
+El socket definido en `src/realtime/locationSocket.js` usa una sala llamada `delivery:demo`. El flujo es intencionalmente pequeno para explicar el patron publicacion/suscripcion:
+
+1. El frontend conecta el socket con su token.
+2. `delivery:subscribe` agrega el socket a la sala.
+3. `delivery:subscribed` devuelve el primer local activo como tienda de la simulacion.
+4. `delivery:location:update` recibe y valida la ubicacion actual del delivery.
+5. `delivery:location:updated` publica esa ubicacion a todos los sockets de la sala.
+6. `delivery:unsubscribe` saca al socket de la sala.
+
+La ultima ubicacion se conserva solo en memoria. No se almacena en SQLite y se pierde al reiniciar el backend.
 
 ## Notas importantes
 
