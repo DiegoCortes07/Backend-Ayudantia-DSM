@@ -9,7 +9,7 @@ const auth = async () => {
   try {
     await database.authenticate();
     console.log("La conexion ha sido establecida correctamente");
-  } catch {
+  } catch (error) {
     console.error("Hubo un error para conectar con la base de datos", error);
   }
 };

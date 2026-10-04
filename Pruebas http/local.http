@@ -1,0 +1,14 @@
+get http://localhost:8000/api/locals/
+
+###
+
+post http://localhost:8000/api/locals/
+Content-Type: application/json
+
+{
+     "name" : "Local Sur",
+     "address" : "Av. Argentina 2500, Antofagasta",
+     "latitude" : -23.66881,
+     "longitude" : -70.40478,
+     "is_active" : true
+}

@@ -1,0 +1,36 @@
+post http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+     "email" : "diego@example.com",
+     "password" : "password123"
+}
+
+###
+
+get http://localhost:8000/api/orders/
+Authorization: Bearer PEGA_AQUI_EL_TOKEN
+
+###
+
+post http://localhost:8000/api/orders/
+Content-Type: application/json
+Authorization: Bearer PEGA_AQUI_EL_TOKEN
+
+{
+     "productId" : 1,
+     "localId" : 1,
+     "quantity" : 1,
+     "deliveryLatitude" : -23.65094,
+     "deliveryLongitude" : -70.39752
+}
+
+###
+
+patch http://localhost:8000/api/orders/1/status
+Content-Type: application/json
+Authorization: Bearer PEGA_AQUI_EL_TOKEN
+
+{
+     "status" : "preparando"
+}
